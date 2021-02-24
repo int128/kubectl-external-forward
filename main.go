@@ -24,7 +24,7 @@ type options struct {
 
 func newSocatCmd(ctx context.Context, o options) *exec.Cmd {
 	c := exec.CommandContext(ctx,
-		"kubectl", "run", o.podName, "--rm", "-it", "--image", o.image,
+		"kubectl", "run", o.podName, "--rm", "--attach", "--image", o.image,
 		"--",
 		"-dd",
 		fmt.Sprintf("tcp-listen:%s,fork", o.localPort),
@@ -38,6 +38,13 @@ func newSocatCmd(ctx context.Context, o options) *exec.Cmd {
 
 func newWaitForPodCmd(ctx context.Context, o options) *exec.Cmd {
 	c := exec.CommandContext(ctx, "kubectl", "wait", "--for=condition=Ready", "pod/"+o.podName)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c
+}
+
+func newDeletePodCmd(ctx context.Context, o options) *exec.Cmd {
+	c := exec.CommandContext(ctx, "kubectl", "delete", "pod", o.podName)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c
@@ -84,13 +91,20 @@ func runSocatAndPortForward(ctx context.Context, o options) error {
 		})
 
 		if err := socatCmd.Wait(); err != nil {
-			// TODO: ensure the pod is deleted
 			return fmt.Errorf("socat error: %w", err)
 		}
 		log.Printf("socat: exit")
 		return nil
 	})
-	return eg.Wait()
+	err := eg.Wait()
+	if err != nil {
+		deletePodCmd := newDeletePodCmd(context.Background(), o)
+		log.Printf("deleting socat pod: %s", deletePodCmd)
+		if err := deletePodCmd.Run(); err != nil {
+			log.Printf("could not delete pod %s: %s", o.podName, err)
+		}
+	}
+	return err
 }
 
 func randomPodSuffix() string {
