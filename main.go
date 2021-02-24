@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base32"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -90,12 +93,19 @@ func runSocatAndPortForward(ctx context.Context, o options) error {
 	return eg.Wait()
 }
 
+func randomPodSuffix() string {
+	b := make([]byte, 15)
+	_, _ = rand.Read(b)
+	s := base32.StdEncoding.EncodeToString(b)
+	s = strings.ToLower(s)
+	return s
+}
+
 func run(ctx context.Context) error {
 	var o options
 	flag.StringVar(&o.localPort, "l", "", "local port of this machine")
 	flag.StringVar(&o.remoteHostPort, "r", "", "remote host:port to connect")
-	// TODO: give a unique name to the pod
-	flag.StringVar(&o.podName, "pod", fmt.Sprintf("socat"), "pod name to run socat")
+	flag.StringVar(&o.podName, "pod", "socat-"+randomPodSuffix(), "pod name to run socat")
 	flag.StringVar(&o.image, "image", "alpine/socat", "container image of socat")
 	flag.Parse()
 	if o.localPort == "" {
