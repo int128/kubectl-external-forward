@@ -184,9 +184,7 @@ func (cmd *Cmd) runRootCmd(ctx context.Context, o rootCmdOptions, _ []string) er
 		return nil
 	})
 	eg.Go(func() error {
-		select {
-		case <-ctx.Done():
-		}
+		<-ctx.Done()
 		close(stopChan)
 		ctx := context.Background()
 		klog.Infof("deleting socat pod %s/%s", socatPod.Namespace, socatPod.Name)
