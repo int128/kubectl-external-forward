@@ -8,6 +8,7 @@ package di
 import (
 	"github.com/google/wire"
 	"github.com/int128/kubectl-socat/pkg/cmd"
+	"github.com/int128/kubectl-socat/pkg/externalforwarder"
 	"github.com/int128/kubectl-socat/pkg/portforwarder"
 )
 
@@ -15,6 +16,7 @@ func NewCmd() cmd.Interface {
 	wire.Build(
 		cmd.Set,
 		portforwarder.Set,
+		externalforwarder.Set,
 	)
 	return nil
 }

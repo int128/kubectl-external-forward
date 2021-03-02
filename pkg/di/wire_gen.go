@@ -7,6 +7,7 @@ package di
 
 import (
 	"github.com/int128/kubectl-socat/pkg/cmd"
+	"github.com/int128/kubectl-socat/pkg/externalforwarder"
 	"github.com/int128/kubectl-socat/pkg/portforwarder"
 )
 
@@ -14,8 +15,11 @@ import (
 
 func NewCmd() cmd.Interface {
 	portForwarder := &portforwarder.PortForwarder{}
-	cmdCmd := &cmd.Cmd{
+	externalForwarder := &externalforwarder.ExternalForwarder{
 		PortForwarder: portForwarder,
+	}
+	cmdCmd := &cmd.Cmd{
+		ExternalForwarder: externalForwarder,
 	}
 	return cmdCmd
 }
