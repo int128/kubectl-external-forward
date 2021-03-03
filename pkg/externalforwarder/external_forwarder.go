@@ -1,13 +1,12 @@
 package externalforwarder
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"io"
+	"os"
+	"os/signal"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/google/wire"
 	"github.com/int128/kubectl-socat/pkg/portforwarder"
 	"golang.org/x/sync/errgroup"
@@ -66,45 +65,43 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 	if err != nil {
 		return fmt.Errorf("could not create socat pod: %w", err)
 	}
-	klog.Infof("created socat pod: %s/%s", socatPod.Namespace, socatPod.Name)
+	klog.Infof("created pod %s/%s", socatPod.Namespace, socatPod.Name)
 
-	stopChan := make(chan struct{})
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
+	defer stop()
 	var eg errgroup.Group
 	eg.Go(func() error {
-		b := backoff.NewExponentialBackOff()
-		b.MaxElapsedTime = 30 * time.Second
-		if err := backoff.Retry(func() error {
-			socatPod, err := clientset.CoreV1().Pods(o.Namespace).Get(ctx, socatPod.Name, metav1.GetOptions{})
-			if err != nil {
-				klog.Infof("waiting for socat pod: %s", err)
-				return err
-			}
-			if socatPod.Status.Phase != corev1.PodRunning {
-				klog.Infof("waiting for socat pod: %s: %s", socatPod.Status.Phase, socatPod.Status.Message)
-				return fmt.Errorf("pod %s/%s is not running", socatPod.Namespace, socatPod.Name)
-			}
-			return nil
-		}, backoff.WithContext(b, ctx)); err != nil {
-			return fmt.Errorf("could not run socat pod: %w", err)
+		<-ctx.Done()
+
+		// clean up the pod
+		ctx := context.Background()
+		ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
+		defer stop()
+		klog.Infof("deleting pod %s/%s...", socatPod.Namespace, socatPod.Name)
+		if err := deletePodWithRetry(ctx, clientset, socatPod.Namespace, socatPod.Name, 30*time.Second); err != nil {
+			return fmt.Errorf("you need to delete pod %s/%s manually: %w", socatPod.Namespace, socatPod.Name, err)
+		}
+		klog.Infof("deleted pod %s/%s", socatPod.Namespace, socatPod.Name)
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := waitForPodRunning(ctx, clientset, socatPod.Namespace, socatPod.Name, 30*time.Second); err != nil {
+			return fmt.Errorf("socat pod is not running: %w", err)
 		}
 
 		eg.Go(func() error {
-			socatLogStream, err := clientset.CoreV1().Pods(o.Namespace).GetLogs(socatPod.Name, &corev1.PodLogOptions{Follow: true}).Stream(ctx)
-			if err != nil {
-				return fmt.Errorf("could not get logs from socat pod: %w", err)
+			if err := tailPodLogs(ctx, clientset, socatPod.Namespace, socatPod.Name); err != nil {
+				return fmt.Errorf("could not tail logs: %w", err)
 			}
-			defer socatLogStream.Close()
-			for {
-				r := bufio.NewReader(socatLogStream)
-				l, _, err := r.ReadLine()
-				if err != nil {
-					if err == io.EOF {
-						return nil
-					}
-					return fmt.Errorf("could not read log from socat pod: %w", err)
-				}
-				klog.Infof("socat: %s", l)
-			}
+			return nil
+		})
+
+		stopChan := make(chan struct{})
+		eg.Go(func() error {
+			<-ctx.Done()
+			close(stopChan)
+			return nil
 		})
 		eg.Go(func() error {
 			klog.Infof("starting port-forwarder from %d to %s/%s:%d", o.LocalPort, socatPod.Namespace, socatPod.Name, o.LocalPort)
@@ -121,19 +118,6 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 			klog.Info("stopped port-forwarder")
 			return nil
 		})
-		return nil
-	})
-	eg.Go(func() error {
-		<-ctx.Done()
-		close(stopChan)
-
-		ctx := context.Background()
-		klog.Infof("deleting socat pod %s/%s", socatPod.Namespace, socatPod.Name)
-		err := clientset.CoreV1().Pods(socatPod.Namespace).Delete(ctx, socatPod.Name, *metav1.NewDeleteOptions(0))
-		if err != nil {
-			return fmt.Errorf("could not delete socat pod: %w", err)
-		}
-		klog.Infof("deleted socat pod %s/%s", socatPod.Namespace, socatPod.Name)
 		return nil
 	})
 	return eg.Wait()
