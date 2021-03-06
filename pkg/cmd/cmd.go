@@ -15,6 +15,10 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	defaultImage = "ghcr.io/int128/kubectl-socat/mirror/alpine/socat:latest"
+)
+
 var Set = wire.NewSet(
 	wire.Struct(new(Cmd), "*"),
 	wire.Bind(new(Interface), new(*Cmd)),
@@ -53,6 +57,7 @@ type rootCmdOptions struct {
 	k8sOptions     *genericclioptions.ConfigFlags
 	localPort      int
 	remoteHostPort string
+	image          string
 }
 
 func (o *rootCmdOptions) addFlags(f *pflag.FlagSet) {
@@ -74,6 +79,7 @@ func (cmd Cmd) newRootCmd() *cobra.Command {
 	o.addFlags(c.Flags())
 	c.Flags().IntVarP(&o.localPort, "local-port", "l", 0, "local port")
 	c.Flags().StringVarP(&o.remoteHostPort, "remote-host", "r", "", "remote host:port")
+	c.Flags().StringVarP(&o.image, "image", "", defaultImage, "Pod image")
 
 	gf := flag.NewFlagSet("", flag.ContinueOnError)
 	klog.InitFlags(gf)
@@ -95,5 +101,6 @@ func (cmd Cmd) runRootCmd(ctx context.Context, o rootCmdOptions, _ []string) err
 		Namespace:      namespace,
 		LocalPort:      o.localPort,
 		RemoteHostPort: o.remoteHostPort,
+		PodImage:       o.image,
 	})
 }

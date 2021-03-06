@@ -31,7 +31,7 @@ Run the following command:
 
 ```console
 % kubectl socat -l 10000 -r www.example.com:80
-I0305 16:59:09.797227   65840 external_forwarder.go:46] creating a socat pod
+I0305 16:59:09.797227   65840 external_forwarder.go:46] creating a socat pod with image ghcr.io/int128/kubectl-socat/mirror/alpine/socat:latest
 I0305 16:59:10.671068   65840 external_forwarder.go:68] created pod default/socat-qn4zt
 I0305 16:59:10.691330   65840 pod.go:29] pod default/socat-qn4zt is still Pending
 I0305 16:59:11.270674   65840 pod.go:29] pod default/socat-qn4zt is still Pending
