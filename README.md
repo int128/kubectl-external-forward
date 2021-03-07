@@ -21,8 +21,7 @@ Install the latest release from [Homebrew](https://brew.sh/) or [GitHub Releases
 
 ```sh
 # Homebrew
-brew tap int128/kubectl-socat https://github.com/int128/kubectl-socat
-brew install kubectl-socat
+brew install int128/tap/kubectl-socat
 ```
 
 ### Connect
