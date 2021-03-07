@@ -6,6 +6,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/google/wire"
 	"github.com/int128/kubectl-socat/pkg/externalforwarder"
@@ -68,10 +70,9 @@ func (cmd Cmd) newRootCmd() *cobra.Command {
 	var o rootCmdOptions
 	o.k8sOptions = genericclioptions.NewConfigFlags(false)
 	c := &cobra.Command{
-		Use:     "kubectl socat",
+		Use:     "kubectl socat [flags] LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...",
 		Short:   "TODO",
-		Example: "TODO",
-		Args:    cobra.NoArgs,
+		Example: `kubectl socat 10000:db.staging:5432`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return cmd.runRootCmd(c.Context(), o, args)
 		},
@@ -87,7 +88,11 @@ func (cmd Cmd) newRootCmd() *cobra.Command {
 	return c
 }
 
-func (cmd Cmd) runRootCmd(ctx context.Context, o rootCmdOptions, _ []string) error {
+func (cmd Cmd) runRootCmd(ctx context.Context, o rootCmdOptions, args []string) error {
+	tunnels, err := parseTunnelArgs(args)
+	if err != nil {
+		return fmt.Errorf("invalid arguments: %w", err)
+	}
 	restConfig, err := o.k8sOptions.ToRESTConfig()
 	if err != nil {
 		return fmt.Errorf("could not load the config: %w", err)
@@ -97,10 +102,36 @@ func (cmd Cmd) runRootCmd(ctx context.Context, o rootCmdOptions, _ []string) err
 		return fmt.Errorf("could not determine the namespace: %w", err)
 	}
 	return cmd.ExternalForwarder.Do(ctx, externalforwarder.Option{
-		Config:         restConfig,
-		Namespace:      namespace,
-		LocalPort:      o.localPort,
-		RemoteHostPort: o.remoteHostPort,
-		PodImage:       o.image,
+		Config:    restConfig,
+		Tunnels:   tunnels,
+		Namespace: namespace,
+		PodImage:  o.image,
 	})
+}
+
+func parseTunnelArgs(args []string) ([]externalforwarder.Tunnel, error) {
+	if len(args) < 1 {
+		return nil, fmt.Errorf("you need to specify one or more arguments")
+	}
+	var tunnels []externalforwarder.Tunnel
+	for _, arg := range args {
+		s := strings.SplitN(arg, ":", 3)
+		if len(s) != 3 {
+			return nil, fmt.Errorf("invalid argument %s", arg)
+		}
+		l, err := strconv.Atoi(s[0])
+		if err != nil {
+			return nil, fmt.Errorf("invalid local port: %w", err)
+		}
+		r, err := strconv.Atoi(s[2])
+		if err != nil {
+			return nil, fmt.Errorf("invalid local port: %w", err)
+		}
+		tunnels = append(tunnels, externalforwarder.Tunnel{
+			LocalPort:  l,
+			RemoteHost: s[1],
+			RemotePort: r,
+		})
+	}
+	return tunnels, nil
 }
