@@ -27,6 +27,7 @@ type Option struct {
 	Namespace      string
 	LocalPort      int
 	RemoteHostPort string
+	PodImage       string
 }
 
 type Interface interface {
@@ -43,7 +44,7 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 		return fmt.Errorf("could not create a client set: %w", err)
 	}
 
-	klog.Infof("creating a socat pod")
+	klog.Infof("creating a socat pod with image %s", o.PodImage)
 	socatPod, err := clientset.CoreV1().Pods(o.Namespace).Create(ctx, &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: "socat-",
@@ -52,7 +53,7 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 			Containers: []corev1.Container{
 				{
 					Name:  "socat",
-					Image: "alpine/socat:latest",
+					Image: o.PodImage,
 					Args: []string{
 						"-dd",
 						fmt.Sprintf("tcp-listen:%d,fork", o.LocalPort),
