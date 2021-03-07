@@ -11,6 +11,7 @@ import (
 	"github.com/int128/kubectl-socat/pkg/portforwarder"
 	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -58,6 +59,12 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 						"-dd",
 						fmt.Sprintf("tcp-listen:%d,fork", o.LocalPort),
 						fmt.Sprintf("tcp-connect:%s", o.RemoteHostPort),
+					},
+					Resources: corev1.ResourceRequirements{
+						Requests: corev1.ResourceList{
+							corev1.ResourceCPU:    resource.MustParse("10m"),
+							corev1.ResourceMemory: resource.MustParse("10Mi"),
+						},
 					},
 				},
 			},
