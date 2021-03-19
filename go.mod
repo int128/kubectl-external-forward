@@ -12,7 +12,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210220050731-9a76102bfb43 // indirect
 	k8s.io/api v0.20.4
-	k8s.io/apimachinery v0.20.4
+	k8s.io/apimachinery v0.20.5
 	k8s.io/cli-runtime v0.20.4
 	k8s.io/client-go v0.20.4
 	k8s.io/klog/v2 v2.8.0
