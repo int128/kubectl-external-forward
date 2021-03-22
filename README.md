@@ -1,15 +1,26 @@
-# kubectl-socat
+# kubectl-socat [![go](https://github.com/int128/kubectl-socat/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/kubectl-socat/actions/workflows/go.yaml)
 
-This is a kubectl plugin of TCP proxy.
-It allows you to connect to a remote host via port-forward and socat pod as follows:
+This is a kubectl plugin to connect to an external host via [socat container](https://hub.docker.com/r/alpine/socat) on a Kubernetes cluster.
+
+For example, you can connect to your database server in the private network via the cluster:
 
 ```
-Local port
+mysql -h localhost -P 13306
 ↓
-Pod (socat)
+localhost:13306
 ↓
-Remote host:port
+socat:13306
+↓
+mysql.staging:3306
 ```
+
+It is equivalent to the following commands:
+
+```sh
+kubectl run socat --rm --attach alpine/socat -- tcp-listen:13306,fork tcp-connect:mysql.staging:3306
+kubectl port-forward socat 13306
+```
+
 
 ## Getting Started
 
@@ -41,7 +52,7 @@ Forwarding from 127.0.0.1:10000 -> 10000
 Press ctrl-c to stop the command.
 It cleans up the socat pod.
 
-As well as you can create multiple tunnels:
+To connect to multiple hosts:
 
 ```console
 % kubectl socat 15432:postgresql.staging:5432 13306:mysql.staging:3306
