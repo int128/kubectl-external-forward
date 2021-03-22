@@ -4,17 +4,9 @@ This is a kubectl plugin to connect to an external host via [socat container](ht
 
 For example, you can connect to your database server in the private network via the cluster:
 
-```
-mysql -h localhost -P 13306
-↓
-localhost:13306
-↓
-socat:13306
-↓
-mysql.staging:3306
-```
+![diagram](docs/kubectl-socat-diagram.svg)
 
-It is equivalent to the following commands:
+This plugin provides an equivalent feature to the following commands:
 
 ```sh
 kubectl run socat --rm --attach alpine/socat -- tcp-listen:13306,fork tcp-connect:mysql.staging:3306
