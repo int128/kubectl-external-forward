@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 
@@ -115,9 +116,17 @@ func parseTunnelArgs(args []string) ([]externalforwarder.Tunnel, error) {
 	}
 	var tunnels []externalforwarder.Tunnel
 	for _, arg := range args {
-		s := strings.SplitN(arg, ":", 3)
-		if len(s) != 3 {
+		s := strings.Split(arg, ":")
+		lh := "127.0.0.1"
+		if len(s) > 4 || len(s) < 3 {
 			return nil, fmt.Errorf("invalid argument %s", arg)
+		}
+		if len(s) == 4 {
+			if net.ParseIP(s[0]) == nil {
+				return nil, fmt.Errorf("invalid local host: %s", s[0])
+			}
+			lh = s[0]
+			s = s[1:]
 		}
 		l, err := strconv.Atoi(s[0])
 		if err != nil {
@@ -128,6 +137,7 @@ func parseTunnelArgs(args []string) ([]externalforwarder.Tunnel, error) {
 			return nil, fmt.Errorf("invalid local port: %w", err)
 		}
 		tunnels = append(tunnels, externalforwarder.Tunnel{
+			LocalHost:  lh,
 			LocalPort:  l,
 			RemoteHost: s[1],
 			RemotePort: r,

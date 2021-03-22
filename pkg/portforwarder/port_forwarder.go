@@ -23,6 +23,7 @@ var Set = wire.NewSet(
 // Option represents an option of PortForwarder.
 type Option struct {
 	Config              *rest.Config
+	SourceHost          string
 	SourcePort          int
 	TargetNamespace     string
 	TargetPodName       string
@@ -54,7 +55,7 @@ func (pf *PortForwarder) Run(o Option, readyChan chan struct{}, stopChan <-chan 
 	}
 	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: rt}, http.MethodPost, pfURL)
 	portPair := fmt.Sprintf("%d:%d", o.SourcePort, o.TargetContainerPort)
-	forwarder, err := portforward.NewOnAddresses(dialer, []string{"127.0.0.1"}, []string{portPair}, stopChan, readyChan, os.Stdout, os.Stderr)
+	forwarder, err := portforward.NewOnAddresses(dialer, []string{o.SourceHost}, []string{portPair}, stopChan, readyChan, os.Stdout, os.Stderr)
 	if err != nil {
 		return fmt.Errorf("could not create a port forwarder: %w", err)
 	}
