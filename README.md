@@ -6,7 +6,7 @@ For example, you can connect to your database server in the private network via 
 
 ![diagram](docs/kubectl-socat-diagram.svg)
 
-It is equivalent to the following commands:
+This plugin provides an equivalent feature to the following commands:
 
 ```sh
 kubectl run socat --rm --attach alpine/socat -- tcp-listen:13306,fork tcp-connect:mysql.staging:3306
