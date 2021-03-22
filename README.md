@@ -27,7 +27,7 @@ brew install int128/tap/kubectl-socat
 
 ### Run
 
-To connect to `www.example.com:80` from local port 10000:
+To connect to a host:
 
 ```console
 % kubectl socat 10000:www.example.com:80
@@ -41,14 +41,29 @@ I0307 22:10:23.336618   76486 pod.go:87] default/socat-dkgm4/tunnel1: 2021/03/07
 Forwarding from 127.0.0.1:10000 -> 10000
 ```
 
-Press ctrl-c to stop the command.
-It cleans up the socat pod.
-
 To connect to multiple hosts:
 
 ```console
 % kubectl socat 15432:postgresql.staging:5432 13306:mysql.staging:3306
 ```
+
+Press ctrl-c to gracefully stop the command and clean up the socat pod.
+
+
+## Considerations
+
+### Garbage collection
+
+Eventually socat pod(s) are remaining after stop.
+It would be better to clean up socat pods periodically to prevent the resource leak.
+
+
+### Docker Hub rate limit
+
+By default, kubectl-socat creates a pod with image `ghcr.io/int128/kubectl-socat/mirror/alpine/socat:latest`.
+It is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) to [GitHub Container Registry](https://ghcr.io/int128/kubectl-socat/mirror/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml).
+
+You can still set your custom image but please note the rate limit of Docker Hub.
 
 
 ## Usage
