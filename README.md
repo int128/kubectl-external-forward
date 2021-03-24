@@ -69,7 +69,7 @@ You can still set your custom image but please note the rate limit of Docker Hub
 ## Usage
 
 ```console
-kubectl socat [flags] LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...
+kubectl socat [flags] [LOCAL_HOST:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...
 
 Flags:
       --add_dir_header                   If true, adds the file directory to the header of the log messages

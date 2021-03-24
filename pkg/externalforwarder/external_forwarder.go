@@ -30,6 +30,7 @@ type Option struct {
 }
 
 type Tunnel struct {
+	LocalHost  string
 	LocalPort  int
 	RemoteHost string
 	RemotePort int
@@ -106,6 +107,7 @@ func (f ExternalForwarder) startPortForwarder(ctx context.Context, eg *errgroup.
 		klog.Infof("starting port-forwarder from %d to %s/%s:%d", tunnel.LocalPort, pod.Namespace, pod.Name, tunnel.LocalPort)
 		po := portforwarder.Option{
 			Config:              restConfig,
+			SourceHost:          tunnel.LocalHost,
 			SourcePort:          tunnel.LocalPort,
 			TargetNamespace:     pod.Namespace,
 			TargetPodName:       pod.Name,
