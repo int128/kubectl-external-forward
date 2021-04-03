@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/google/wire"
-	"github.com/int128/kubectl-socat/pkg/portforwarder"
+	"github.com/int128/kubectl-external-forward/pkg/portforwarder"
 	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

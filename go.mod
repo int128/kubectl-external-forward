@@ -1,4 +1,4 @@
-module github.com/int128/kubectl-socat
+module github.com/int128/kubectl-external-forward
 
 go 1.16
 
