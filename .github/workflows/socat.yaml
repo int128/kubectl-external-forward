@@ -11,7 +11,7 @@ on:
 
 jobs:
   # mirror https://hub.docker.com/r/alpine/socat to GHCR
-  mirror-docker-hub-alpine-socat:
+  push:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
