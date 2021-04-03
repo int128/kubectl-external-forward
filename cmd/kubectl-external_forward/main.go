@@ -7,7 +7,7 @@ import (
 	"github.com/int128/kubectl-external-forward/pkg/di"
 )
 
-var version = "v0.0.0"
+var version = "latest"
 
 func main() {
 	os.Exit(di.NewCmd().Run(context.Background(), os.Args, version))
