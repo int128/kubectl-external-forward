@@ -1,17 +1,14 @@
 # kubectl-socat [![go](https://github.com/int128/kubectl-socat/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/kubectl-socat/actions/workflows/go.yaml)
 
-This is a kubectl plugin to connect to an external host via [socat container](https://hub.docker.com/r/alpine/socat) on a Kubernetes cluster.
-
-For example, you can connect to your database server in the private network via the cluster:
+This is a kubectl plugin to connect to an external host from your laptop via a cluster.
+For example, you can run your application locally using remote databases on Cloud.
 
 ![diagram](docs/kubectl-socat-diagram.svg)
 
-This plugin provides an equivalent feature to the following commands:
+Features:
 
-```sh
-kubectl run socat --rm --attach alpine/socat -- tcp-listen:13306,fork tcp-connect:mysql.staging:3306
-kubectl port-forward socat 13306
-```
+- Forward to a host outside of a cluster (`kubectl port-forward` only forwards to a pod in a cluster)
+- No proxy configuration is needed such as HTTP or SOCKS proxy
 
 
 ## Getting Started
@@ -52,9 +49,18 @@ Press ctrl-c to gracefully stop the command and clean up the socat pod.
 
 ## Considerations
 
-### Garbage collection
+### Garbage collection of socat pod
 
-Eventually socat pod(s) are remaining after stop.
+This plugin provides an equivalent feature to the following commands:
+
+```sh
+kubectl run socat --rm --attach alpine/socat -- tcp-listen:13306,fork tcp-connect:mysql.staging:3306
+kubectl port-forward socat 13306
+# finally
+kubectl delete pod socat
+```
+
+It finally deletes socat pod but eventually it may be remaining after stop.
 It would be better to clean up socat pods periodically to prevent the resource leak.
 
 
