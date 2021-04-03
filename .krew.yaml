@@ -1,45 +1,45 @@
 apiVersion: krew.googlecontainertools.github.com/v1alpha2
 kind: Plugin
 metadata:
-  name: socat
+  name: external-forward
 spec:
   homepage: https://github.com/int128/kubectl-external-forward
   shortDescription: connect to external host via socat pod
   description: This is a kubectl plugin to connect to an external host via socat Pod on a cluster
   version: {{ .TagName }}
   platforms:
-  - bin: kubectl-socat
-    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-socat_linux_amd64.zip" .TagName }}
+  - bin: kubectl-external_forward
+    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-external_forward_linux_amd64.zip" .TagName }}
     selector:
       matchLabels:
         os: linux
         arch: amd64
-  - bin: kubectl-socat
-    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-socat_linux_arm64.zip" .TagName }}
+  - bin: kubectl-external_forward
+    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-external_forward_linux_arm64.zip" .TagName }}
     selector:
       matchLabels:
         os: linux
         arch: arm64
-  - bin: kubectl-socat
-    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-socat_linux_arm.zip" .TagName }}
+  - bin: kubectl-external_forward
+    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-external_forward_linux_arm.zip" .TagName }}
     selector:
       matchLabels:
         os: linux
         arch: arm
-  - bin: kubectl-socat
-    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-socat_darwin_amd64.zip" .TagName }}
+  - bin: kubectl-external_forward
+    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-external_forward_darwin_amd64.zip" .TagName }}
     selector:
       matchLabels:
         os: darwin
         arch: amd64
-  - bin: kubectl-socat
-    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-socat_darwin_arm64.zip" .TagName }}
+  - bin: kubectl-external_forward
+    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-external_forward_darwin_arm64.zip" .TagName }}
     selector:
       matchLabels:
         os: darwin
         arch: arm64
-  - bin: kubectl-socat
-    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-socat_windows_amd64.zip" .TagName }}
+  - bin: kubectl-external_forward
+    {{ addURIAndSha "https://github.com/int128/kubectl-external-forward/releases/download/{{ .TagName }}/kubectl-external_forward_windows_amd64.zip" .TagName }}
     selector:
       matchLabels:
         os: windows
