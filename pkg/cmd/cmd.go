@@ -71,9 +71,9 @@ func (cmd Cmd) newRootCmd() *cobra.Command {
 	var o rootCmdOptions
 	o.k8sOptions = genericclioptions.NewConfigFlags(false)
 	c := &cobra.Command{
-		Use:     "kubectl socat [flags] [LOCAL_HOST:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...",
+		Use:     "kubectl external-forward [flags] [LOCAL_HOST:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...",
 		Short:   "TODO",
-		Example: `kubectl socat 10000:db.staging:5432`,
+		Example: `kubectl external-forward 10000:db.staging:5432`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return cmd.runRootCmd(c.Context(), o, args)
 		},

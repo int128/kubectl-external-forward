@@ -1,4 +1,4 @@
-TARGET := kubectl-socat
+TARGET := kubectl-external_forward
 TARGET_ARCHIVE := $(TARGET)_$(GOOS)_$(GOARCH).zip
 TARGET_DIGEST := $(TARGET)_$(GOOS)_$(GOARCH).zip.sha256
 
