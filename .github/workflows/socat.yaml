@@ -25,7 +25,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
       - run: docker pull alpine/socat
       - run: docker tag alpine/socat ${{ matrix.image }}
       - run: docker push ${{ matrix.image }}
