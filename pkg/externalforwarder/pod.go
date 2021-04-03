@@ -19,6 +19,10 @@ func newPod(o Option) *corev1.Pod {
 	pod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: "socat-",
+			Annotations: map[string]string{
+				// do not prevent scale-in of cluster autoscaler
+				"cluster-autoscaler.kubernetes.io/safe-to-evict": "true",
+			},
 		},
 		Spec: corev1.PodSpec{},
 	}
