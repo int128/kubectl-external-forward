@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/google/wire"
-	"github.com/int128/kubectl-socat/pkg/externalforwarder"
+	"github.com/int128/kubectl-external-forward/pkg/externalforwarder"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"

@@ -7,9 +7,9 @@ package di
 
 import (
 	"github.com/google/wire"
-	"github.com/int128/kubectl-socat/pkg/cmd"
-	"github.com/int128/kubectl-socat/pkg/externalforwarder"
-	"github.com/int128/kubectl-socat/pkg/portforwarder"
+	"github.com/int128/kubectl-external-forward/pkg/cmd"
+	"github.com/int128/kubectl-external-forward/pkg/externalforwarder"
+	"github.com/int128/kubectl-external-forward/pkg/portforwarder"
 )
 
 func NewCmd() cmd.Interface {
