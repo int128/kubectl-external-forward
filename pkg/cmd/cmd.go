@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	defaultImage = "ghcr.io/int128/kubectl-socat/mirror/alpine/socat:latest"
+	defaultImage = "ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat:latest"
 )
 
 var Set = wire.NewSet(
