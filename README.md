@@ -1,4 +1,4 @@
-# kubectl-socat [![go](https://github.com/int128/kubectl-socat/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/kubectl-socat/actions/workflows/go.yaml)
+# kubectl-external-forward [![go](https://github.com/int128/kubectl-external-forward/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/kubectl-external-forward/actions/workflows/go.yaml)
 
 This is a kubectl plugin to connect to an external host from your laptop via a cluster.
 For example, you can run your application locally using remote databases on Cloud.
@@ -15,11 +15,11 @@ Features:
 
 ### Setup
 
-Install the latest release from [Homebrew](https://brew.sh/) or [GitHub Releases](https://github.com/int128/kubectl-socat/releases).
+Install the latest release from [Homebrew](https://brew.sh/) or [GitHub Releases](https://github.com/int128/kubectl-external-forward/releases).
 
 ```sh
 # Homebrew
-brew install int128/tap/kubectl-socat
+brew install int128/tap/kubectl-external-forward
 ```
 
 ### Run
@@ -27,7 +27,7 @@ brew install int128/tap/kubectl-socat
 To connect to a host:
 
 ```console
-% kubectl socat 10000:www.example.com:80
+% kubectl external-forward 10000:www.example.com:80
 I0307 22:10:21.520991   76486 external_forwarder.go:52] creating a pod
 I0307 22:10:21.586707   76486 external_forwarder.go:58] created pod default/socat-dkgm4
 I0307 22:10:21.611300   76486 pod.go:57] pod default/socat-dkgm4 is still Pending
@@ -41,7 +41,7 @@ Forwarding from 127.0.0.1:10000 -> 10000
 To connect to multiple hosts:
 
 ```console
-% kubectl socat 15432:postgresql.staging:5432 13306:mysql.staging:3306
+% kubectl external-forward 15432:postgresql.staging:5432 13306:mysql.staging:3306
 ```
 
 Press ctrl-c to gracefully stop the command and clean up the socat pod.
@@ -66,8 +66,8 @@ It would be better to clean up socat pods periodically to prevent the resource l
 
 ### Docker Hub rate limit
 
-By default, kubectl-socat creates a pod with image `ghcr.io/int128/kubectl-socat/mirror/alpine/socat:latest`.
-It is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) to [GitHub Container Registry](https://ghcr.io/int128/kubectl-socat/mirror/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml).
+By default, kubectl-external-forward creates a pod with image `ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat:latest`.
+It is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) to [GitHub Container Registry](https://ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml).
 
 You can still set your custom image but please note the rate limit of Docker Hub.
 
@@ -75,7 +75,7 @@ You can still set your custom image but please note the rate limit of Docker Hub
 ## Usage
 
 ```console
-kubectl socat [flags] [LOCAL_HOST:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...
+kubectl external-forward [flags] [LOCAL_HOST:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT...
 
 Flags:
       --add_dir_header                   If true, adds the file directory to the header of the log messages
@@ -89,7 +89,7 @@ Flags:
       --cluster string                   The name of the kubeconfig cluster to use
       --context string                   The name of the kubeconfig context to use
   -h, --help                             help for kubectl
-      --image string                     Pod image (default "ghcr.io/int128/kubectl-socat/mirror/alpine/socat:latest")
+      --image string                     Pod image (default "ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat:latest")
       --insecure-skip-tls-verify         If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string                Path to the kubeconfig file to use for CLI requests.
   -l, --local-port int                   local port
