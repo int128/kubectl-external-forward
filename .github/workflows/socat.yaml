@@ -14,9 +14,11 @@ jobs:
   mirror-docker-hub-alpine-socat:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      DOCKER_BUILDKIT: 1
-      DOCKER_REPOSITORY: ghcr.io/${{ github.repository }}/mirror/alpine/socat
+    strategy:
+      matrix:
+        image:
+          - ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat
+          - ghcr.io/int128/kubectl-socat/mirror/alpine/socat
     steps:
       - uses: actions/checkout@v2
       - uses: docker/login-action@v1
@@ -25,5 +27,5 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - run: docker pull alpine/socat
-      - run: docker tag alpine/socat "$DOCKER_REPOSITORY"
-      - run: docker push "$DOCKER_REPOSITORY"
+      - run: docker tag alpine/socat ${{ matrix.image }}
+      - run: docker push ${{ matrix.image }}
