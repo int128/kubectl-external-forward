@@ -8,7 +8,7 @@ LDFLAGS := -X main.version=$(VERSION)
 all: $(TARGET)
 
 $(TARGET):
-	go build -o $@ -ldflags "$(LDFLAGS)"
+	go build -o $@ -ldflags "$(LDFLAGS)" ./cmd/$(TARGET)
 
 .PHONY: dist
 dist: $(TARGET_ARCHIVE) $(TARGET_DIGEST)

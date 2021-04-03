@@ -20,6 +20,9 @@ Install the latest release from [Homebrew](https://brew.sh/) or [GitHub Releases
 ```sh
 # Homebrew
 brew install int128/tap/kubectl-external-forward
+
+# Go 1.16+
+go install github.com/int128/kubectl-external-forward/cmd/kubectl-external_forward@latest
 ```
 
 ### Run
