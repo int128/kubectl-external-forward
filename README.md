@@ -12,8 +12,8 @@ For example, you can run your application locally using remote databases.
 This plugin allows you to connect to a host outside of a cluster.
 It is useful when a host is in a **private network** and **unreachable** from your laptop.
 `kubectl port-forward` only allows you to connect to a pod inside a cluster.
- 
-This plugin provides a TCP proxy.
+
+This plugin provides TCP proxy.
 Just run your application with localhost configuration, like connecting to MySQL on your laptop.
 No proxy configuration such as HTTP_PROXY or SOCKS is needed.
 
