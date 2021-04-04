@@ -1,6 +1,6 @@
 # kubectl-external-forward [![go](https://github.com/int128/kubectl-external-forward/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/kubectl-external-forward/actions/workflows/go.yaml)
 
-This is a kubectl plugin to connect to an external host from your laptop via a cluster.
+This is a kubectl plugin to connect from your laptop to an external host via a proxy pod on a cluster.
 
 For example, you can run your application locally using remote databases.
 
@@ -9,12 +9,12 @@ For example, you can run your application locally using remote databases.
 
 ## Why
 
-This plugin allows you to connect to a host outside of a cluster.
-It is useful when a host is in a **private network** and **unreachable** from your laptop.
-`kubectl port-forward` only allows you to connect to a pod inside a cluster.
+This allows you to connect from your laptop to a host outside of a cluster.
+It is useful when a host (such as database or API endpoint) is in a **private network** and **unreachable** from your laptop.
+While `kubectl port-forward` connects to a pod inside a cluster, this connects to a host outside a cluster.
 
-This plugin provides TCP proxy.
-Just run your application with localhost configuration, like connecting to MySQL on your laptop.
+This plugin runs a TCP proxy pod on a cluster and set up a port-forwarder on your laptop.
+You just run your application with localhost configuration as if a database is running on local.
 No proxy configuration such as HTTP_PROXY or SOCKS is needed.
 
 This is an alternative of SSH bastion.
