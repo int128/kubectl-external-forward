@@ -4,8 +4,18 @@ metadata:
   name: external-forward
 spec:
   homepage: https://github.com/int128/kubectl-external-forward
-  shortDescription: connect to external host via socat pod
-  description: This is a kubectl plugin to connect to an external host via socat Pod on a cluster
+  shortDescription: connect to external host via cluster
+  description: |
+    This is a kubectl plugin to connect to an external host from your laptop via a cluster.
+
+    This plugin allows you to connect to a host outside of a cluster.
+    It is useful when a host is in a private network and unreachable from your laptop.
+    kubectl port-forward only allows you to connect to a pod inside a cluster.
+
+    This plugin provides TCP proxy.
+    Just run your application with localhost configuration, like connecting to MySQL on your laptop.
+    No proxy configuration such as HTTP_PROXY or SOCKS is needed.
+
   version: {{ .TagName }}
   platforms:
   - bin: kubectl-external_forward
