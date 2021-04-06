@@ -12,6 +12,7 @@ import (
 
 	"github.com/google/wire"
 	"github.com/int128/kubectl-external-forward/pkg/externalforwarder"
+	"github.com/int128/kubectl-external-forward/pkg/tunnel"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -19,7 +20,7 @@ import (
 )
 
 const (
-	defaultImage = "ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat:latest"
+	defaultImage = "getenvoy/envoy:stable" //TODO: mirror to GHCR
 )
 
 var Set = wire.NewSet(
@@ -110,11 +111,11 @@ func (cmd Cmd) runRootCmd(ctx context.Context, o rootCmdOptions, args []string) 
 	})
 }
 
-func parseTunnelArgs(args []string) ([]externalforwarder.Tunnel, error) {
+func parseTunnelArgs(args []string) ([]tunnel.Tunnel, error) {
 	if len(args) < 1 {
 		return nil, fmt.Errorf("you need to specify one or more arguments")
 	}
-	var tunnels []externalforwarder.Tunnel
+	var tunnels []tunnel.Tunnel
 	for _, arg := range args {
 		s := strings.Split(arg, ":")
 		lh := "127.0.0.1"
@@ -136,7 +137,7 @@ func parseTunnelArgs(args []string) ([]externalforwarder.Tunnel, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid local port: %w", err)
 		}
-		tunnels = append(tunnels, externalforwarder.Tunnel{
+		tunnels = append(tunnels, tunnel.Tunnel{
 			LocalHost:  lh,
 			LocalPort:  l,
 			RemoteHost: s[1],

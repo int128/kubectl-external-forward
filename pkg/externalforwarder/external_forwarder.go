@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/wire"
 	"github.com/int128/kubectl-external-forward/pkg/portforwarder"
+	"github.com/int128/kubectl-external-forward/pkg/tunnel"
 	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,16 +26,9 @@ var Set = wire.NewSet(
 
 type Option struct {
 	Config    *rest.Config
-	Tunnels   []Tunnel
+	Tunnels   []tunnel.Tunnel
 	Namespace string
 	PodImage  string
-}
-
-type Tunnel struct {
-	LocalHost  string
-	LocalPort  int
-	RemoteHost string
-	RemotePort int
 }
 
 type Interface interface {
@@ -52,12 +46,15 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 	}
 
 	klog.Infof("creating a pod")
-	socatPod := newPod(o)
-	socatPod, err = clientset.CoreV1().Pods(o.Namespace).Create(ctx, socatPod, metav1.CreateOptions{})
+	pod, err := newPod(o)
 	if err != nil {
-		return fmt.Errorf("could not create socat pod: %w", err)
+		return fmt.Errorf("could not generate pod spec: %w", err)
 	}
-	klog.Infof("created pod %s/%s", socatPod.Namespace, socatPod.Name)
+	pod, err = clientset.CoreV1().Pods(o.Namespace).Create(ctx, pod, metav1.CreateOptions{})
+	if err != nil {
+		return fmt.Errorf("could not create pod: %w", err)
+	}
+	klog.Infof("created pod %s/%s", pod.Namespace, pod.Name)
 
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
@@ -69,35 +66,35 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 		ctx := context.Background()
 		ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 		defer stop()
-		klog.Infof("deleting pod %s/%s...", socatPod.Namespace, socatPod.Name)
-		if err := deletePodWithRetry(ctx, clientset, socatPod.Namespace, socatPod.Name, 30*time.Second); err != nil {
-			return fmt.Errorf("you need to delete pod %s/%s manually: %w", socatPod.Namespace, socatPod.Name, err)
+		klog.Infof("deleting pod %s/%s...", pod.Namespace, pod.Name)
+		if err := deletePodWithRetry(ctx, clientset, pod.Namespace, pod.Name, 30*time.Second); err != nil {
+			return fmt.Errorf("you need to delete pod %s/%s manually: %w", pod.Namespace, pod.Name, err)
 		}
-		klog.Infof("deleted pod %s/%s", socatPod.Namespace, socatPod.Name)
+		klog.Infof("deleted pod %s/%s", pod.Namespace, pod.Name)
 		return nil
 	})
 
 	eg.Go(func() error {
-		if err := waitForPodRunning(ctx, clientset, socatPod.Namespace, socatPod.Name, 30*time.Second); err != nil {
-			return fmt.Errorf("socat pod is not running: %w", err)
+		if err := waitForPodRunning(ctx, clientset, pod.Namespace, pod.Name, 30*time.Second); err != nil {
+			return fmt.Errorf("pod is not running: %w", err)
 		}
 
-		for _, container := range socatPod.Spec.Containers {
+		for _, container := range pod.Spec.Containers {
 			containerName := container.Name
 			eg.Go(func() error {
-				return tailPodLogs(ctx, clientset, socatPod.Namespace, socatPod.Name, containerName)
+				return tailPodLogs(ctx, clientset, pod.Namespace, pod.Name, containerName)
 			})
 		}
 
-		for _, tunnel := range o.Tunnels {
-			f.startPortForwarder(ctx, &eg, o.Config, tunnel, socatPod)
+		for _, t := range o.Tunnels {
+			f.startPortForwarder(ctx, &eg, o.Config, t, pod)
 		}
 		return nil
 	})
 	return eg.Wait()
 }
 
-func (f ExternalForwarder) startPortForwarder(ctx context.Context, eg *errgroup.Group, restConfig *rest.Config, tunnel Tunnel, pod *corev1.Pod) {
+func (f ExternalForwarder) startPortForwarder(ctx context.Context, eg *errgroup.Group, restConfig *rest.Config, tunnel tunnel.Tunnel, pod *corev1.Pod) {
 	stopChan := make(chan struct{})
 	eg.Go(func() error {
 		<-ctx.Done()
