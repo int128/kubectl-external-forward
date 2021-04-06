@@ -40,15 +40,15 @@ go install github.com/int128/kubectl-external-forward/cmd/kubectl-external_forwa
 To connect to a host:
 
 ```console
-% kubectl external-forward 10000:www.example.com:80
-I0307 22:10:21.520991   76486 external_forwarder.go:52] creating a pod
-I0307 22:10:21.586707   76486 external_forwarder.go:58] created pod default/socat-dkgm4
-I0307 22:10:21.611300   76486 pod.go:57] pod default/socat-dkgm4 is still Pending
-I0307 22:10:22.181070   76486 pod.go:57] pod default/socat-dkgm4 is still Pending
-I0307 22:10:23.274268   76486 external_forwarder.go:106] starting port-forwarder from 10000 to default/socat-dkgm4:10000
-I0307 22:10:23.335257   76486 pod.go:87] default/socat-dkgm4/tunnel1: 2021/03/07 13:10:23 socat[1] W ioctl(5, IOCTL_VM_SOCKETS_GET_LOCAL_CID, ...): Not a tty
-I0307 22:10:23.336618   76486 pod.go:87] default/socat-dkgm4/tunnel1: 2021/03/07 13:10:23 socat[1] N listening on AF=2 0.0.0.0:10000
-Forwarding from 127.0.0.1:10000 -> 10000
+% kubectl external-forward 10080:www.example.com:80
+I0406 10:40:42.734644   19125 external_forwarder.go:48] creating a pod
+I0406 10:40:42.782034   19125 external_forwarder.go:57] created pod default/kubectl-external-forward-txbks
+I0406 10:40:42.803104   19125 pod.go:67] pod default/kubectl-external-forward-txbks is still Pending
+I0406 10:40:43.368883   19125 pod.go:67] pod default/kubectl-external-forward-txbks is still Pending
+I0406 10:40:44.461645   19125 external_forwarder.go:105] starting port-forwarder from 10080 to default/kubectl-external-forward-txbks:10080
+...
+Forwarding from 127.0.0.1:10080 -> 10080
+Handling connection for 10080
 ```
 
 To connect to multiple hosts:
@@ -57,32 +57,24 @@ To connect to multiple hosts:
 % kubectl external-forward 15432:postgresql.staging:5432 13306:mysql.staging:3306
 ```
 
-Press ctrl-c to gracefully stop the command and clean up the socat pod.
+Press ctrl-c to gracefully stop the command and clean up the pod.
 
 
 ## Considerations
 
-### Garbage collection of socat pod
+### Garbage collection of pod
 
-This plugin provides an equivalent feature to the following commands:
-
-```sh
-kubectl run socat --rm --attach alpine/socat -- tcp-listen:13306,fork tcp-connect:mysql.staging:3306
-kubectl port-forward socat 13306
-# finally
-kubectl delete pod socat
-```
-
-It finally deletes socat pod but eventually it may be remaining after stop.
-It would be better to clean up socat pods periodically to prevent the resource leak.
+This plugin creates a pod running Envoy.
+It finally deletes the pod but eventually it may be remaining after stopped.
+It would be better to clean up the pods periodically to prevent the resource leak.
 
 
 ### Docker Hub rate limit
 
-By default, kubectl-external-forward creates a pod with image `ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat:latest`.
-It is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) to [GitHub Container Registry](https://ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml).
+By default, kubectl-external-forward creates a pod with image `getenvoy/envoy:stable`.
 
-You can still set your custom image but please note the rate limit of Docker Hub.
+TODO: mirror to GHCR
+<!-- It is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) to [GitHub Container Registry](https://ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml). -->
 
 
 ## Usage
@@ -102,7 +94,7 @@ Flags:
       --cluster string                   The name of the kubeconfig cluster to use
       --context string                   The name of the kubeconfig context to use
   -h, --help                             help for kubectl
-      --image string                     Pod image (default "ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat:latest")
+      --image string                     Pod image (default "getenvoy/envoy:stable")
       --insecure-skip-tls-verify         If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string                Path to the kubeconfig file to use for CLI requests.
   -l, --local-port int                   local port
