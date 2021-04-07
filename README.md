@@ -4,7 +4,7 @@ This is a kubectl plugin to connect from your laptop to an external host via a p
 
 For example, you can run your application locally using remote databases.
 
-![diagram](docs/kubectl-socat-diagram.svg)
+![diagram](docs/diagram.svg)
 
 
 ## Why
