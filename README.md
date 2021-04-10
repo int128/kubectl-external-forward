@@ -94,7 +94,7 @@ Flags:
       --cluster string                   The name of the kubeconfig cluster to use
       --context string                   The name of the kubeconfig context to use
   -h, --help                             help for kubectl
-      --image string                     Pod image (default "getenvoy/envoy:stable")
+      --image string                     Pod image (default "ghcr.io/int128/kubectl-external-forward/mirror/envoy")
       --insecure-skip-tls-verify         If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string                Path to the kubeconfig file to use for CLI requests.
   -l, --local-port int                   local port

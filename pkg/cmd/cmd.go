@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	defaultImage = "getenvoy/envoy:stable" //TODO: mirror to GHCR
+	defaultImage = "ghcr.io/int128/kubectl-external-forward/mirror/envoy"
 )
 
 var Set = wire.NewSet(
