@@ -1,24 +1,23 @@
-name: socat
+name: mirror
 
 on:
   pull_request:
     branches:
       - master
     paths:
-      - .github/workflows/socat.yaml
+      - .github/workflows/mirror.yaml
   schedule:
     - cron: 1 0 * * *
 
 jobs:
-  # mirror https://hub.docker.com/r/alpine/socat to GHCR
-  push:
+  image:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       matrix:
         image:
-          - ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat
-          - ghcr.io/int128/kubectl-socat/mirror/alpine/socat
+          - src: envoyproxy/envoy:v1.17-latest
+            dst: ghcr.io/int128/kubectl-external-forward/mirror/envoy
     steps:
       - uses: actions/checkout@v2
       - uses: docker/login-action@v1
@@ -26,6 +25,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
-      - run: docker pull alpine/socat
-      - run: docker tag alpine/socat ${{ matrix.image }}
-      - run: docker push ${{ matrix.image }}
+      - run: docker pull ${{ matrix.image.src }}
+      - run: docker tag ${{ matrix.image.src }} ${{ matrix.image.dst }}
+      - run: docker push ${{ matrix.image.dst }}
