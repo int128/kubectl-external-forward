@@ -17,7 +17,7 @@ cluster: $(KUBECONFIG)
 $(KUBECONFIG):
 	kind create cluster --name $(CLUSTER_NAME)
 	# fix error: serviceaccount "default" not found
-	sleep 30
+	sleep 10
 
 .PHONY: delete-cluster
 delete-cluster:
