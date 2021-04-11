@@ -25,7 +25,7 @@ func main() {
 		defer close(chInterrupt)
 		time.Sleep(5 * time.Second)
 		b := backoff.NewExponentialBackOff()
-		b.MaxElapsedTime = 1 * time.Minute
+		b.MaxElapsedTime = 90 * time.Second
 		return backoff.Retry(func() error { return openRequest(ctx) }, b)
 	})
 	eg.Go(func() error {
