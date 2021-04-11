@@ -23,10 +23,13 @@ func main() {
 	chInterrupt := make(chan struct{})
 	eg.Go(func() error {
 		defer close(chInterrupt)
-		time.Sleep(5 * time.Second)
 		b := backoff.NewExponentialBackOff()
 		b.MaxElapsedTime = 90 * time.Second
-		return backoff.Retry(func() error { return openRequest(ctx) }, b)
+		b.MaxInterval = 3 * time.Second
+		notify := func(err error, d time.Duration) {
+			log.Printf("openRequest: %s", err)
+		}
+		return backoff.RetryNotify(func() error { return openRequest(ctx) }, b, notify)
 	})
 	eg.Go(func() error {
 		if err := runExternalForward(chInterrupt); err != nil {
