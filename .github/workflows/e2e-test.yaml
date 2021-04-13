@@ -1,0 +1,38 @@
+name: e2e-test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/e2e-test.yaml
+      - pkg/**
+      - cmd/**
+      - e2e_test/**
+      - go.*
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/e2e-test.yaml
+      - pkg/**
+      - cmd/**
+      - e2e_test/**
+      - go.*
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-${{ runner.os }}-
+      - run: make
+      - run: make -C e2e_test -j3

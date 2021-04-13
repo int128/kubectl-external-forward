@@ -67,7 +67,7 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 		ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 		defer stop()
 		klog.Infof("deleting pod %s/%s...", pod.Namespace, pod.Name)
-		if err := deletePodWithRetry(ctx, clientset, pod.Namespace, pod.Name, 30*time.Second); err != nil {
+		if err := deletePodWithRetry(ctx, clientset, pod.Namespace, pod.Name, 60*time.Second); err != nil {
 			return fmt.Errorf("you need to delete pod %s/%s manually: %w", pod.Namespace, pod.Name, err)
 		}
 		klog.Infof("deleted pod %s/%s", pod.Namespace, pod.Name)
@@ -75,7 +75,7 @@ func (f ExternalForwarder) Do(ctx context.Context, o Option) error {
 	})
 
 	eg.Go(func() error {
-		if err := waitForPodRunning(ctx, clientset, pod.Namespace, pod.Name, 30*time.Second); err != nil {
+		if err := waitForPodRunning(ctx, clientset, pod.Namespace, pod.Name, 60*time.Second); err != nil {
 			return fmt.Errorf("pod is not running: %w", err)
 		}
 

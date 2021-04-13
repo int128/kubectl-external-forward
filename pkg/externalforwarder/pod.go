@@ -69,6 +69,7 @@ func waitForPodRunning(ctx context.Context, c *kubernetes.Clientset, namespace, 
 
 	b := backoff.NewExponentialBackOff()
 	b.MaxElapsedTime = timeout
+	b.MaxInterval = 3 * time.Second
 	if err := backoff.RetryNotify(checkIfRunning, backoff.WithContext(b, ctx), notify); err != nil {
 		return err
 	}
@@ -112,6 +113,7 @@ func deletePodWithRetry(ctx context.Context, c *kubernetes.Clientset, namespace,
 
 	b := backoff.NewExponentialBackOff()
 	b.MaxElapsedTime = timeout
+	b.MaxInterval = 3 * time.Second
 	if err := backoff.RetryNotify(attempt, backoff.WithContext(b, ctx), notify); err != nil {
 		return err
 	}

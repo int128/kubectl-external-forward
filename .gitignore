@@ -1,1 +1,4 @@
 .idea/
+
+/kubectl-external_forward
+e2e_test/output/
