@@ -98,4 +98,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: rajatjindal/krew-release-bot@v0.0.39
+      #TODO: https://github.com/kubernetes-sigs/krew-index/pull/1132
+      #- uses: rajatjindal/krew-release-bot@v0.0.39
