@@ -1,10 +1,7 @@
 # kubectl-external-forward [![go](https://github.com/int128/kubectl-external-forward/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/kubectl-external-forward/actions/workflows/go.yaml)
 
 This is a kubectl plugin to connect from your laptop to an external host via a proxy pod on a cluster.
-
-For example, you can run your application locally using remote databases.
-
-![diagram](docs/diagram.svg)
+It runs [Envoy Proxy](https://www.envoyproxy.io) in a pod and establishes port-forwarding from your laptop to a host outside the cluster.
 
 
 ## Why
@@ -19,6 +16,15 @@ No proxy configuration such as HTTP_PROXY or SOCKS is needed.
 
 This is an alternative of SSH bastion.
 You no longer maintain your bastion servers.
+
+
+### Use case: run application on laptop using remote database
+
+You can run your application on the local machine using the remote database.
+For example, in our organization, everyday we copy the production database into another one for development.
+It is useful for testing user experience using the production database.
+
+![diagram](docs/diagram.svg)
 
 
 ## Getting Started
@@ -69,12 +75,10 @@ It finally deletes the pod but eventually it may be remaining after stopped.
 It would be better to clean up the pods periodically to prevent the resource leak.
 
 
-### Docker Hub rate limit
+### Envoy image
 
-By default, kubectl-external-forward creates a pod with image `getenvoy/envoy:stable`.
-
-TODO: mirror to GHCR
-<!-- It is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) to [GitHub Container Registry](https://ghcr.io/int128/kubectl-external-forward/mirror/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml). -->
+By default, this plugin creates a pod with [the image on GitHub Container Registry](https://ghcr.io/int128/kubectl-external-forward/mirror/envoy), which is mirrored from [Docker Hub](https://hub.docker.com/r/alpine/socat) everyday in [this workflow](.github/workflows/socat.yaml).
+It avoids the rate limit of Docker Hub in your environment.
 
 
 ## Usage
