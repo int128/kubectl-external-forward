@@ -21,8 +21,12 @@ You no longer maintain your bastion servers.
 ### Use case: run application on laptop using remote database
 
 You can run your application on the local machine using the remote database.
-For example, in our organization, everyday we copy the production database into another one for development.
+
+For example, in our organization, we everyday copy the production database into another one for development (via a snapshot of Amazon Aurora).
 It is useful for testing user experience using the production database.
+We cannot access our databases directly because they are in the private network for security reason.
+
+Here is a diagram how we access the development database via the cluster.
 
 ![diagram](docs/diagram.svg)
 
