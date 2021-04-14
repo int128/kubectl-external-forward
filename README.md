@@ -59,11 +59,17 @@ Handling connection for 10080
 
 To connect to multiple hosts:
 
-```console
-% kubectl external-forward 15432:postgresql.staging:5432 13306:mysql.staging:3306
+```sh
+kubectl external-forward 15432:postgresql.staging:5432 13306:mysql.staging:3306
 ```
 
-Press ctrl-c to gracefully stop the command and clean up the pod.
+To listen on 0.0.0.0 (useful for Docker bridge):
+
+```sh
+kubectl external-forward 0.0.0.0:15432:postgresql.staging:5432
+```
+
+Press ctrl-c to stop the command gracefully. It will clean up the proxy pod.
 
 
 ## Considerations
