@@ -1,14 +1,26 @@
-TARGET := kubectl-external_forward
-TARGET_ARCHIVE := $(TARGET)_$(GOOS)_$(GOARCH).zip
-TARGET_DIGEST := $(TARGET)_$(GOOS)_$(GOARCH).zip.sha256
+PRODUCT := kubectl-external_forward
+TARGET_ARCHIVE := $(PRODUCT)_$(GOOS)_$(GOARCH).zip
+TARGET_DIGEST := $(PRODUCT)_$(GOOS)_$(GOARCH).zip.sha256
 
-VERSION ?= $(notdir $(GITHUB_REF))
+ifeq ($(GOOS), windows)
+  TARGET := $(PRODUCT).exe
+else
+  TARGET := $(PRODUCT)
+endif
+
+# determine the version from ref
+ifeq ($(GITHUB_REF), refs/heads/master)
+  VERSION := latest
+else
+  VERSION ?= $(notdir $(GITHUB_REF))
+endif
+
 LDFLAGS := -X main.version=$(VERSION)
 
 all: $(TARGET)
 
 $(TARGET):
-	go build -o $@ -ldflags "$(LDFLAGS)" ./cmd/$(TARGET)
+	go build -o $@ -ldflags "$(LDFLAGS)" ./cmd/kubectl-external_forward
 
 .PHONY: dist
 dist: $(TARGET_ARCHIVE) $(TARGET_DIGEST)
