@@ -3,7 +3,7 @@ module github.com/int128/kubectl-external-forward
 go 1.16
 
 require (
-	github.com/cenkalti/backoff/v4 v4.1.0
+	github.com/cenkalti/backoff/v4 v4.1.1
 	github.com/golang/mock v1.5.0
 	github.com/google/go-cmp v0.5.5
 	github.com/google/wire v0.5.0
