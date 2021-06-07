@@ -23,17 +23,6 @@ on:
       - Makefile
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-      - uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.38.0
-
   test:
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +36,9 @@ jobs:
           key: go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             go-${{ runner.os }}-
+      - uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.38.0
       - run: go test -v -race -cover -coverprofile=coverage.out ./...
       - uses: codecov/codecov-action@v1
 
