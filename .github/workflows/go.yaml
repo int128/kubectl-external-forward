@@ -39,6 +39,8 @@ jobs:
       - uses: golangci/golangci-lint-action@v2
         with:
           version: v1.38.0
+          skip-go-installation: true
+          skip-pkg-cache: true
       - run: go test -v -race -cover -coverprofile=coverage.out ./...
       - uses: codecov/codecov-action@v1
 
