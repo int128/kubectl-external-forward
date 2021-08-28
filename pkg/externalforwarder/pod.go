@@ -23,6 +23,7 @@ func newPod(o Option) (*corev1.Pod, error) {
 			Annotations: map[string]string{
 				// do not prevent scale-in of cluster autoscaler
 				"cluster-autoscaler.kubernetes.io/safe-to-evict": "true",
+				"sidecar.istio.io/inject": "false",
 			},
 		},
 		Spec: corev1.PodSpec{},
