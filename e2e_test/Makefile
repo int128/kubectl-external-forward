@@ -11,7 +11,7 @@ cluster: $(KUBECONFIG)
 $(KUBECONFIG):
 	kind create cluster --name $(CLUSTER_NAME)
 	# fix error: serviceaccount "default" not found
-	sleep 10
+	while ! kubectl get serviceaccount default; do sleep 3; done
 
 .PHONY: delete-cluster
 delete-cluster:
