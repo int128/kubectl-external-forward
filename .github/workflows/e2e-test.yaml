@@ -28,5 +28,5 @@ jobs:
       - uses: int128/go-actions/setup@v1
         with:
           go-version: 1.16
-      - run: go build -o kubectl-external_forward
+      - run: go build ./cmd/kubectl-external_forward
       - run: make -C e2e_test -j3
