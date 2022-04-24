@@ -2,15 +2,9 @@ CLUSTER_NAME := kubectl-external-forward-e2e
 KUBECONFIG := output/kubeconfig.yaml
 export KUBECONFIG
 
-PATH := $(CURDIR)/..:$(PATH)
-export PATH
-
 .PHONY: test
-test: cluster target
-	go run .
-
-target:
-	$(MAKE) -C ..
+test: cluster
+	PATH=$(CURDIR)/..:$(PATH) go run .
 
 .PHONY: cluster
 cluster: $(KUBECONFIG)
