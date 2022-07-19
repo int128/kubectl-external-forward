@@ -20,7 +20,7 @@ jobs:
             dst: ghcr.io/int128/kubectl-external-forward/mirror/envoy
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/login-action@v1
+      - uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
