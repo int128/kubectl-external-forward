@@ -4,6 +4,16 @@ This is a kubectl plugin to connect from your computer to an external host via a
 It runs [Envoy Proxy](https://www.envoyproxy.io) in a pod and establishes port-forwarding from your computer to a host outside the cluster.
 
 
+## Deprecated :warning:
+
+It is recommended to deploy https://github.com/int128/ktunnels into your cluster.
+
+This plugin has the following issues:
+
+- Poor experience: It takes a long time to run an Envoy pod.
+- Cost: Garbage pod may remain if the plugin could not clean up. It may affect the running cost of your cluster, for example, Cluster Autoscaler keeps a node due to an orphan pod.
+
+
 ## Why
 
 This allows you to connect from your computer to a host outside of a cluster.
